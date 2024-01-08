@@ -19,6 +19,7 @@ import {
   Card,
   Flex,
   CardBody,
+  Select,
 } from "@chakra-ui/react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
@@ -30,13 +31,15 @@ import {
 } from "@tabler/icons-react";
 import { formatTimestamp, isImageFormat } from "../utils";
 import { useDialog } from "../components/AlertDialogProvider";
-import { CivitiModel, CivitiModelGetResp, CivitiTypes } from "../types";
+import { CivitiModel, CivitiModelFileVersion } from "../types";
+import { InstallModelsApiInput, installModelsApi } from "../api/modelsApi";
+import ModelCard from "./ModelCard";
 const IMAGE_SIZE = 200;
 
 export default function GalleryModal({ onclose }: { onclose: () => void }) {
   const [selectedID, setSelectedID] = useState<string[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [models, setModels] = useState<CivitiTypes.Model[]>([]);
+  const [models, setModels] = useState<CivitiModel[]>([]);
   const [loading, setLoading] = useState(false);
   const { showDialog } = useDialog();
   const loadData = useCallback(async () => {
@@ -51,11 +54,24 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
     setModels(json.items);
     setLoading(false);
   }, []);
+  const onClickInstallModel = (file: CivitiModelFileVersion) => {
+    console.log("file", file);
+    if (file.downloadUrl == null || file.name == null) {
+      console.error("file.downloadUrl or file.name is null");
+      return;
+    }
+    installModelsApi({
+      filename: file.name,
+      name: file.name,
+      save_path: "checkpoints",
+      url: file.downloadUrl,
+    });
+  };
   useEffect(() => {
     loadData();
   }, []);
 
-  const onClickMedia = (model: CivitiModel) => {
+  const onClickMedia = (model: CivitiModelFileVersion) => {
     // window.open(`/workspace/view_media?filename=${media.localPath}`);
   };
   const isAllSelected =
@@ -96,62 +112,12 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
               />
             )}
             {models?.map((model) => {
-              console.log("model", model);
-              const modelPhoto = model.modelVersions[0]?.images[0]?.url;
               return (
-                <Card
-                  width={IMAGE_SIZE}
-                  justifyContent={"space-between"}
-                  mb={2}
-                  gap={1}
-                >
-                  <Image
-                    borderRadius={3}
-                    boxSize={IMAGE_SIZE + "px"}
-                    objectFit="cover"
-                    src={modelPhoto}
-                    alt={"model cover image"}
-                  />
-                  <Stack p={1}>
-                    <Tooltip label={model.name}>
-                      <Text fontWeight={500} noOfLines={1}>
-                        {model.name}
-                      </Text>
-                    </Tooltip>
-                    <Flex
-                      justifyContent={"space-between"}
-                      alignItems={"center"}
-                    >
-                      <Button
-                        borderRadius={14}
-                        noOfLines={1}
-                        size={"xs"}
-                        colorScheme="teal"
-                        maxWidth={"40%"}
-                        flexShrink={1}
-                        variant={"outline"}
-                        px={1}
-                      >
-                        <Text
-                          whiteSpace="nowrap"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                        >
-                          {model.type}
-                        </Text>
-                      </Button>
-                      <Button
-                        leftIcon={<IconDownload size={18} />}
-                        iconSpacing={1}
-                        borderRadius={12}
-                        size={"sm"}
-                        py={1}
-                      >
-                        Install
-                      </Button>
-                    </Flex>
-                  </Stack>
-                </Card>
+                <ModelCard
+                  model={model}
+                  key={model.id}
+                  onClickInstallModel={onClickInstallModel}
+                />
               );
             })}
           </HStack>

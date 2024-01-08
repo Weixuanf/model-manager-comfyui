@@ -3,10 +3,10 @@ import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  define: {
-    // a hacky resolution for reactDOM process is not defined error
-    "process.env.NODE_ENV": '"production"',
-  },
+  // define: {
+  //   // a hacky resolution for reactDOM process is not defined error
+  //   "process.env.NODE_ENV": '"production"',
+  // },
   envDir: ".",
   build: {
     watch: {

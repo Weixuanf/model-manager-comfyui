@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { app } from "/scripts/app.js";
 // @ts-ignore
 import { api } from "/scripts/api.js";
-import { ComfyExtension, ComfyObjectInfo } from "./comfy-types/comfy";
 import { Box } from "@chakra-ui/react";
 
 import { Topbar } from "./topbar/Topbar";

@@ -5,138 +5,124 @@ export interface PanelPosition {
   left: number;
 }
 
-export type CivitiModel = {
-  name: string;
-  modelVersions: CivitiModelVersion;
-};
 export type CivitiModelGetResp = {
   items: Array<CivitiModel>;
 };
 
-export type CivitiModelVersion = {
-  name: string;
-  version: string;
-  modelPath: string;
-  modelType: string;
-  modelVersion: string;
+export type CivitiModel = {
+  id: number;
+  name?: string;
+  description?: string;
+  type?: string;
+  poi?: boolean;
+  nsfw?: boolean;
+  allowNoCredit?: boolean;
+  allowCommercialUse?: string;
+  allowDerivatives?: boolean;
+  allowDifferentLicense?: boolean;
+  stats?: CivitiModelStats;
+  creator?: CivitiModelCreator;
+  tags?: string[];
+  modelVersions?: CivitiModelVersion[];
 };
 
-export namespace CivitiTypes {
-  export type Model = {
-    id: number;
-    name: string;
-    description: string;
-    type: string;
-    poi: boolean;
-    nsfw: boolean;
-    allowNoCredit: boolean;
-    allowCommercialUse: string;
-    allowDerivatives: boolean;
-    allowDifferentLicense: boolean;
-    stats: ModelStats;
-    creator: ModelCreator;
-    tags: string[];
-    modelVersions: ModelVersion[];
-  };
+export type CivitiModelVersion = {
+  id: number;
+  modelId?: number;
+  name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  status?: string;
+  publishedAt?: string;
+  trainedWords?: string[];
+  trainingStatus?: string | null;
+  trainingDetails?: string | null;
+  baseModel?: string;
+  baseModelType?: string;
+  earlyAccessTimeFrame?: number;
+  description?: string;
+  vaeId?: string | null;
+  stats?: CivitiModelVersionStats;
+  files?: CivitiModelFileVersion[];
+  images?: CivitiModelVersionImage[];
+  downloadUrl?: string;
+};
 
-  type ModelVersion = {
-    id: number;
-    modelId: number;
-    name: string;
-    createdAt: string;
-    updatedAt: string;
-    status: string;
-    publishedAt: string;
-    trainedWords: string[];
-    trainingStatus: string | null;
-    trainingDetails: string | null;
-    baseModel: string;
-    baseModelType: string;
-    earlyAccessTimeFrame: number;
-    description: string;
-    vaeId: string | null;
-    stats: ModelVersionStats;
-    files: ModelFileVersion[];
-    images: ModelVersionImage[];
-    downloadUrl: string;
-  };
+export type CivitiModelStats = {
+  downloadCount?: number;
+  favoriteCount?: number;
+  commentCount?: number;
+  ratingCount?: number;
+  rating?: number;
+  tippedAmountCount?: number;
+};
 
-  type ModelStats = {
-    downloadCount: number;
-    favoriteCount: number;
-    commentCount: number;
-    ratingCount: number;
-    rating: number;
-    tippedAmountCount: number;
-  };
+export type CivitiModelCreator = {
+  username?: string;
+  image?: string;
+};
 
-  type ModelCreator = {
-    username: string;
-    image: string;
-  };
+export type CivitiModelVersionStats = {
+  downloadCount?: number;
+  ratingCount?: number;
+  rating?: number;
+};
 
-  type ModelVersionStats = {
-    downloadCount: number;
-    ratingCount: number;
-    rating: number;
-  };
+export type CivitiModelFileVersion = {
+  id: number;
+  sizeKB?: number;
+  name?: string;
+  type?: string;
+  metadata?: CivitiFileMetadata;
+  pickleScanResult?: string;
+  pickleScanMessage?: string | null;
+  virusScanResult?: string;
+  virusScanMessage?: string | null;
+  scannedAt?: string;
+  hashes?: CivitiFileHashes;
+  downloadUrl?: string;
+  primary?: boolean;
+};
 
-  type ModelFileVersion = {
-    id: number;
-    sizeKB: number;
-    name: string;
-    type: string;
-    metadata: FileMetadata;
-    pickleScanResult: string;
-    pickleScanMessage: string | null;
-    virusScanResult: string;
-    virusScanMessage: string | null;
-    scannedAt: string;
-    hashes: FileHashes;
-    downloadUrl: string;
-    primary: boolean;
-  };
+export type CivitiFileMetadata = {
+  fp?: string;
+  size?: string;
+  format?: string;
+};
 
-  type FileMetadata = {
-    fp: string;
-    size: string;
-    format: string;
-  };
+export type CivitiFileHashes = {
+  AutoV1?: string;
+  AutoV2?: string;
+  SHA256?: string;
+  CRC32?: string;
+  BLAKE3?: string;
+  AutoV3?: string;
+};
 
-  type FileHashes = {
-    AutoV1: string;
-    AutoV2: string;
-    SHA256: string;
-    CRC32: string;
-    BLAKE3: string;
-    AutoV3: string;
-  };
+export type CivitiModelVersionImage = {
+  id: number;
+  url?: string;
+  nsfw?: string;
+  width?: number;
+  height?: number;
+  hash?: string;
+  type?: string;
+  metadata?: CivitiImageMetadata;
+  meta?: CivitiImageMeta;
+};
 
-  type ModelVersionImage = {
-    id: number;
-    url: string;
-    nsfw: string;
-    width: number;
-    height: number;
-    hash: string;
-    type: string;
-    metadata: ImageMetadata;
-    meta: ImageMeta;
-  };
+export type CivitiImageMetadata = {
+  hash?: string;
+  size?: number;
+  width?: number;
+  height?: number;
+};
 
-  type ImageMetadata = {
-    hash: string;
-    size: number;
-    width: number;
-    height: number;
-  };
-
-  type ImageMeta = {
-    seed: number;
-    steps: number;
-    prompt: string;
-    sampler: string;
-    cfgScale: number;
-    negativePrompt: string;
-  };
-}
+export type CivitiImageMeta = {
+  seed?: number;
+  steps?: number;
+  prompt?: string;
+  sampler?: string;
+  cfgScale?: number;
+  negativePrompt?: string;
+};

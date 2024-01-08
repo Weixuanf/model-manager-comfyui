@@ -38,3 +38,8 @@ export function isVideoFormat(fileName: string) {
 export function getFileUrl(relativePath: string) {
   return `/workspace/view_media?filename=${relativePath}`;
 }
+
+export function KBtoGB(kilobytes: number, decimalPlaces: number = 1) {
+  var sizeInGB = kilobytes / 1048576; // 1024 * 1024
+  return Number(sizeInGB.toFixed(decimalPlaces));
+}

@@ -10,7 +10,7 @@ import { AlertDialogProvider } from "./components/AlertDialogProvider.tsx";
 
 const topbar = document.createElement("div");
 document.body.append(topbar);
-
+console.log("at main");
 const config: ThemeConfig = {
   initialColorMode: "dark",
   useSystemColorMode: false,
