@@ -16,7 +16,7 @@ import {
   Heading,
   Checkbox,
 } from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { IconPin, IconPinFilled, IconTrash, IconX } from "@tabler/icons-react";
 import { formatTimestamp, isImageFormat } from "../utils";
 import { useDialog } from "../components/AlertDialogProvider";
@@ -28,21 +28,33 @@ export type Media = {
   localPath: string;
   format: string;
 };
+type CivitiModel = {
+  name: string;
+};
+type CivitiModelGetResp = {
+  items: Array<CivitiModel>;
+};
 export default function GalleryModal({ onclose }: { onclose: () => void }) {
   const [selectedID, setSelectedID] = useState<string[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [images, setImages] = useState<Media[]>([]);
+  const [models, setModels] = useState<CivitiModel[]>([]);
   const { showDialog } = useDialog();
-  const loadData = async () => {
-    setImages([] ?? []);
-  };
+  const loadData = useCallback(async () => {
+    const params = { limit: "3", types: "Checkpoint" };
+    const queryString = new URLSearchParams(params).toString();
+    const fullURL = `https://civitai.com/api/v1/models?${queryString}`;
+
+    const data = await fetch(
+      "https://civitai.com/api/v1/models?limit=3&types=Checkpoint"
+    );
+    const json: CivitiModelGetResp = await data.json();
+    console.log("json", json);
+    setModels(json.items);
+  }, []);
   useEffect(() => {
     loadData();
   }, []);
 
-  const onRefreshImagesList = () => {
-    loadData();
-  };
   const onClickMedia = (media: Media) => {
     if (isSelecting) {
       if (selectedID.includes(media.id)) {
@@ -55,7 +67,7 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
     window.open(`/workspace/view_media?filename=${media.localPath}`);
   };
   const isAllSelected =
-    images.length > 0 && selectedID.length === images.length;
+    models.length > 0 && selectedID.length === models.length;
   return (
     <Modal isOpen={true} onClose={onclose} blockScrollOnMount={true}>
       <ModalOverlay />
@@ -65,32 +77,10 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
             <Heading size={"md"} mr={2}>
               Models
             </Heading>
-            {/* <Button
-              size={"sm"}
-              colorScheme="pink"
-              onClick={() => {
-                setIsSelecting(true);
-                setSelectedID(images.map((i) => i.id));
-              }}
-            >
-              Share{" "}
-              {isSelecting && selectedID.length > 0 ? selectedID.length : ""}
-            </Button> */}
           </HStack>
           {isSelecting && (
             <HStack gap={3}>
-              <Checkbox
-                isChecked={isAllSelected}
-                onChange={() => {
-                  if (isAllSelected) {
-                    setSelectedID([]);
-                  } else {
-                    setSelectedID(images.map((i) => i.id));
-                  }
-                }}
-              >
-                All
-              </Checkbox>
+              <Checkbox isChecked={isAllSelected}>All</Checkbox>
               <Text fontSize={16}>{selectedID.length} Selected</Text>
               <IconButton
                 size={"sm"}
@@ -104,62 +94,20 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
         <ModalCloseButton />
         <ModalBody overflowY={"auto"}>
           <HStack wrap={"wrap"}>
-            {images.map((media) => {
-              if (media.localPath == null) {
-                return null;
-              }
-              const mediaPreview = true ? (
-                <Link
-                  isExternal
-                  onClick={() => onClickMedia(media)}
-                  position={"relative"}
-                >
-                  {isSelecting && (
-                    <Checkbox
-                      isChecked={selectedID.includes(media.id)}
-                      position={"absolute"}
-                      top={2}
-                      left={2}
-                    />
-                  )}
-                  <Image
-                    borderRadius={3}
-                    boxSize={IMAGE_SIZE + "px"}
-                    objectFit="cover"
-                    src={`/workspace/view_media?filename=${media.localPath}`}
-                    alt={"workflow image renamed or moved from output folder"}
-                  />
-                </Link>
-              ) : (
-                <Link isExternal onClick={() => onClickMedia(media)}>
-                  {isSelecting && (
-                    <Checkbox isChecked={selectedID.includes(media.id)} />
-                  )}
-                  <video
-                    width={IMAGE_SIZE}
-                    height={IMAGE_SIZE}
-                    src={`/workspace/view_media?filename=${media.localPath}`}
-                    loop={true}
-                    autoPlay={true}
-                    muted={true}
-                  >
-                    <track kind="captions" />
-                  </video>
-                </Link>
-              );
-
+            {models?.map((model) => {
+              console.log("model", model);
               return (
                 <Stack
                   width={IMAGE_SIZE}
                   justifyContent={"space-between"}
                   mb={2}
                 >
-                  <Tooltip label={formatTimestamp(media.createTime, true)}>
+                  {/* <Tooltip label={formatTimestamp(media.createTime, true)}>
                     {mediaPreview}
-                  </Tooltip>
-                  <Tooltip label={media.localPath}>
+                  </Tooltip> */}
+                  <Tooltip label={model.name}>
                     <Text color={"GrayText"} noOfLines={1}>
-                      {media.localPath}
+                      {model.name}
                     </Text>
                   </Tooltip>
                   <HStack justifyContent={"space-between"} hidden={isSelecting}>
