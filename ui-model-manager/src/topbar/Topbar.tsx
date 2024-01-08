@@ -2,7 +2,7 @@ import { Box, Button, HStack } from "@chakra-ui/react";
 import Draggable from "../components/Draggable";
 import { IconGripVertical } from "@tabler/icons-react";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { WorkspaceContext } from "../WorkspaceContext";
+import { ManagerContext } from "../ManagerContext";
 import { PanelPosition } from "../types";
 interface Props {}
 
@@ -26,7 +26,7 @@ export function Topbar({}: Props) {
   }, []);
 
   const [isHovered, setIsHovered] = useState(false);
-  const { setRoute } = useContext(WorkspaceContext);
+  const { setRoute } = useContext(ManagerContext);
 
   const updatePanelPosition = useCallback(
     (position?: PanelPosition) => {

@@ -18,7 +18,6 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { IconPin, IconPinFilled, IconTrash, IconX } from "@tabler/icons-react";
-import { WorkspaceContext } from "../WorkspaceContext";
 import { formatTimestamp, isImageFormat } from "../utils";
 import { useDialog } from "../components/AlertDialogProvider";
 const IMAGE_SIZE = 200;
@@ -30,24 +29,16 @@ export type Media = {
   format: string;
 };
 export default function GalleryModal({ onclose }: { onclose: () => void }) {
-  const { curFlowID, loadNewWorkflow, loadFilePath } =
-    useContext(WorkspaceContext);
   const [selectedID, setSelectedID] = useState<string[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [images, setImages] = useState<Media[]>([]);
   const { showDialog } = useDialog();
   const loadData = async () => {
-    if (curFlowID == null) return;
-
     setImages([] ?? []);
   };
   useEffect(() => {
     loadData();
   }, []);
-
-  if (curFlowID == null) {
-    return null;
-  }
 
   const onRefreshImagesList = () => {
     loadData();
@@ -181,26 +172,7 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
                         onClick={() => {}}
                       />
                     </Tooltip>
-                    <Button
-                      flexGrow={1}
-                      onClick={() =>
-                        showDialog("How do you want to load this workflow?", [
-                          {
-                            label: "Load in new workflow",
-                            onClick: () => {
-                              loadFilePath(media.localPath);
-                            },
-                            colorScheme: "teal",
-                          },
-                          {
-                            label: "Overwrite current workflow",
-                            onClick: () => loadFilePath(media.localPath, true),
-                            colorScheme: "red",
-                          },
-                        ])
-                      }
-                      size={"sm"}
-                    >
+                    <Button flexGrow={1} size={"sm"}>
                       Load
                     </Button>
                     <Tooltip label="Remove image from gallery">

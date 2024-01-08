@@ -9,7 +9,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-ui/node_modules
+node_modules
 db
 dist-ssr
 *.local
