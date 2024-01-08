@@ -15,59 +15,52 @@ import {
   IconButton,
   Heading,
   Checkbox,
+  Spinner,
+  Card,
+  Flex,
+  CardBody,
 } from "@chakra-ui/react";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { IconPin, IconPinFilled, IconTrash, IconX } from "@tabler/icons-react";
+import {
+  IconDownload,
+  IconPin,
+  IconPinFilled,
+  IconTrash,
+  IconX,
+} from "@tabler/icons-react";
 import { formatTimestamp, isImageFormat } from "../utils";
 import { useDialog } from "../components/AlertDialogProvider";
+import { CivitiModel, CivitiModelGetResp, CivitiTypes } from "../types";
 const IMAGE_SIZE = 200;
-export type Media = {
-  id: string;
-  workflowID: string;
-  createTime: number;
-  localPath: string;
-  format: string;
-};
-type CivitiModel = {
-  name: string;
-};
-type CivitiModelGetResp = {
-  items: Array<CivitiModel>;
-};
+
 export default function GalleryModal({ onclose }: { onclose: () => void }) {
   const [selectedID, setSelectedID] = useState<string[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [models, setModels] = useState<CivitiModel[]>([]);
+  const [models, setModels] = useState<CivitiTypes.Model[]>([]);
+  const [loading, setLoading] = useState(false);
   const { showDialog } = useDialog();
   const loadData = useCallback(async () => {
-    const params = { limit: "3", types: "Checkpoint" };
+    setLoading(true);
+    const params = { limit: "16", types: "Checkpoint" };
     const queryString = new URLSearchParams(params).toString();
     const fullURL = `https://civitai.com/api/v1/models?${queryString}`;
 
-    const data = await fetch(
-      "https://civitai.com/api/v1/models?limit=3&types=Checkpoint"
-    );
-    const json: CivitiModelGetResp = await data.json();
+    const data = await fetch(fullURL);
+    const json = await data.json();
     console.log("json", json);
     setModels(json.items);
+    setLoading(false);
   }, []);
   useEffect(() => {
     loadData();
   }, []);
 
-  const onClickMedia = (media: Media) => {
-    if (isSelecting) {
-      if (selectedID.includes(media.id)) {
-        setSelectedID(selectedID.filter((id) => id !== media.id));
-      } else {
-        setSelectedID([...selectedID, media.id]);
-      }
-      return;
-    }
-    window.open(`/workspace/view_media?filename=${media.localPath}`);
+  const onClickMedia = (model: CivitiModel) => {
+    // window.open(`/workspace/view_media?filename=${media.localPath}`);
   };
   const isAllSelected =
     models.length > 0 && selectedID.length === models.length;
+
   return (
     <Modal isOpen={true} onClose={onclose} blockScrollOnMount={true}>
       <ModalOverlay />
@@ -94,47 +87,71 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
         <ModalCloseButton />
         <ModalBody overflowY={"auto"}>
           <HStack wrap={"wrap"}>
+            {loading && (
+              <Spinner
+                thickness="4px"
+                emptyColor="gray.200"
+                color="pink.500"
+                size="lg"
+              />
+            )}
             {models?.map((model) => {
               console.log("model", model);
+              const modelPhoto = model.modelVersions[0]?.images[0]?.url;
               return (
-                <Stack
+                <Card
                   width={IMAGE_SIZE}
                   justifyContent={"space-between"}
                   mb={2}
+                  gap={1}
                 >
-                  {/* <Tooltip label={formatTimestamp(media.createTime, true)}>
-                    {mediaPreview}
-                  </Tooltip> */}
-                  <Tooltip label={model.name}>
-                    <Text color={"GrayText"} noOfLines={1}>
-                      {model.name}
-                    </Text>
-                  </Tooltip>
-                  <HStack justifyContent={"space-between"} hidden={isSelecting}>
-                    <Tooltip label="Set as cover">
-                      <IconButton
-                        size={"sm"}
-                        variant={"ghost"}
-                        icon={<IconPin size={19} />}
-                        aria-label="set as cover"
-                        onClick={() => {}}
-                      />
+                  <Image
+                    borderRadius={3}
+                    boxSize={IMAGE_SIZE + "px"}
+                    objectFit="cover"
+                    src={modelPhoto}
+                    alt={"model cover image"}
+                  />
+                  <Stack p={1}>
+                    <Tooltip label={model.name}>
+                      <Text fontWeight={500} noOfLines={1}>
+                        {model.name}
+                      </Text>
                     </Tooltip>
-                    <Button flexGrow={1} size={"sm"}>
-                      Load
-                    </Button>
-                    <Tooltip label="Remove image from gallery">
-                      <IconButton
+                    <Flex
+                      justifyContent={"space-between"}
+                      alignItems={"center"}
+                    >
+                      <Button
+                        borderRadius={14}
+                        noOfLines={1}
+                        size={"xs"}
+                        colorScheme="teal"
+                        maxWidth={"40%"}
+                        flexShrink={1}
+                        variant={"outline"}
+                        px={1}
+                      >
+                        <Text
+                          whiteSpace="nowrap"
+                          overflow="hidden"
+                          textOverflow="ellipsis"
+                        >
+                          {model.type}
+                        </Text>
+                      </Button>
+                      <Button
+                        leftIcon={<IconDownload size={18} />}
+                        iconSpacing={1}
+                        borderRadius={12}
                         size={"sm"}
-                        variant={"ghost"}
-                        icon={<IconTrash size={19} />}
-                        aria-label="remove image from gallery"
-                        colorScheme="red"
-                        onClick={() => {}}
-                      />
-                    </Tooltip>
-                  </HStack>
-                </Stack>
+                        py={1}
+                      >
+                        Install
+                      </Button>
+                    </Flex>
+                  </Stack>
+                </Card>
               );
             })}
           </HStack>
