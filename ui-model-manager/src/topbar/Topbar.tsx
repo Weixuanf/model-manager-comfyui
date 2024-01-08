@@ -9,15 +9,17 @@ interface Props {}
 const WIDTH = 200;
 export function Topbar({}: Props) {
   const [positionStyle, setPositionStyle] = useState<PanelPosition>({
-    top: 2,
+    top: 0,
     left: 0,
   });
   // Adjust the initial position to top-right
   useEffect(() => {
     const handleResize = () => {
-      // const { top = 0, left = 0 }: PanelPosition = JSON.parse(
-      //   localStorage.getItem("model_manager_position") ?? "{}"
-      // );
+      const cache = localStorage.getItem("model_manager_position");
+      if (cache != null) {
+        setPositionStyle(JSON.parse(cache));
+        return;
+      }
       setPositionStyle({ left: window.innerWidth - WIDTH, top: 0 }); // 200 is an example width of your component
     };
     window.addEventListener("resize", handleResize);
@@ -41,9 +43,11 @@ export function Topbar({}: Props) {
 
       if (top + 36 > clientHeight) top = clientHeight - 36;
       if (left + offsetWidth >= clientWidth) left = clientWidth - offsetWidth;
-
-      setPositionStyle({ top: Math.max(0, top), left: Math.max(0, left) });
-      const cachePos: PanelPosition = { top, left };
+      const cachePos: PanelPosition = {
+        top: Math.max(0, top),
+        left: Math.max(0, left),
+      };
+      setPositionStyle(cachePos);
       localStorage.setItem("model_manager_position", JSON.stringify(cachePos));
     },
     [positionStyle]
