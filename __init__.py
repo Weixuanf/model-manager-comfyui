@@ -1,3 +1,4 @@
+from .model_installer import download_url_with_wget
 import server
 from aiohttp import web
 import aiohttp
@@ -51,8 +52,8 @@ async def install_model(request):
 
     try:
         if model_path is not None:
-            print(f"Install model '{json_data['name']}' into '{model_path}'")
-            res = download_url_with_agent(json_data['url'], model_path)
+            print(f"🖌️Model Manager: Installing model '{json_data['name']}' into '{model_path}' ...")
+            res = download_url_with_wget(json_data['url'], model_path)
         else:
             print(f"Model installation error: invalid model type - {json_data['type']}")
 
