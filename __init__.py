@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 import subprocess
 import os
 import json
-from .version_control import update_version_if_outdated
+import urllib.request
 
 WEB_DIRECTORY = "dist"
 NODE_CLASS_MAPPINGS = {}
@@ -52,14 +52,7 @@ async def install_model(request):
     try:
         if model_path is not None:
             print(f"Install model '{json_data['name']}' into '{model_path}'")
-
-            if json_data['url'].startswith('https://github.com') or json_data['url'].startswith('https://huggingface.co'):
-                model_dir = get_model_dir(json_data)
-                download_url(json_data['url'], model_dir)
-                
-                return web.json_response({}, content_type='application/json')
-            else:
-                res = download_url_with_agent(json_data['url'], model_path)
+            res = download_url_with_agent(json_data['url'], model_path)
         else:
             print(f"Model installation error: invalid model type - {json_data['type']}")
 
@@ -70,6 +63,28 @@ async def install_model(request):
         pass
 
     return web.Response(status=400)
+
+def download_url_with_agent(url, save_path):
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+
+        req = urllib.request.Request(url, headers=headers)
+        response = urllib.request.urlopen(req)
+        data = response.read()
+
+        if not os.path.exists(os.path.dirname(save_path)):
+            os.makedirs(os.path.dirname(save_path))
+
+        with open(save_path, 'wb') as f:
+            f.write(data)
+
+    except Exception as e:
+        print(f"Download error: {url} / {e}", file=sys.stderr)
+        return False
+
+    print("Installation was successful.")
+    return True
 
 def get_model_dir(data):
     if data['save_path'] != 'default':
