@@ -20,6 +20,7 @@ import {
   Flex,
   CardBody,
   Select,
+  Input,
 } from "@chakra-ui/react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
@@ -71,9 +72,6 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
     loadData();
   }, []);
 
-  const onClickMedia = (model: CivitiModelFileVersion) => {
-    // window.open(`/workspace/view_media?filename=${media.localPath}`);
-  };
   const isAllSelected =
     models.length > 0 && selectedID.length === models.length;
 
@@ -82,10 +80,11 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
       <ModalOverlay />
       <ModalContent width={"90%"} maxWidth={"90vw"} height={"90vh"}>
         <ModalHeader>
-          <HStack gap={2} mb={2}>
+          <HStack gap={2} mb={2} alignItems={"center"}>
             <Heading size={"md"} mr={2}>
               Models
             </Heading>
+            <Input placeholder="Search models in CivitAI" />
           </HStack>
           {isSelecting && (
             <HStack gap={3}>

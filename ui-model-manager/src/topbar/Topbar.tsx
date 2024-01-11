@@ -29,7 +29,6 @@ export function Topbar({}: Props) {
 
   const [isHovered, setIsHovered] = useState(false);
   const { setRoute } = useContext(ManagerContext);
-
   const updatePanelPosition = useCallback(
     (position?: PanelPosition) => {
       const { top: curTop = 0, left: curLeft = 0 } = positionStyle || {};

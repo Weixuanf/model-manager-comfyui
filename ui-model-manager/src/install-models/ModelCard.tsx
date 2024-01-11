@@ -35,6 +35,9 @@ export default function ModelCard({
   const curFile = versionFiles?.find(
     (versionFile) => versionFile?.name === selectedFile
   );
+  const onClickMedia = () => {
+    window.open(`https://civitai.com/models/${model.id}`);
+  };
   const installHandler = useCallback(() => {
     if (curFile == null) {
       console.error("no file is find by name", selectedFile);
@@ -50,6 +53,8 @@ export default function ModelCard({
         objectFit="cover"
         src={modelPhoto}
         alt={"model cover image"}
+        cursor={"pointer"}
+        onClick={() => onClickMedia()}
       />
       <Stack p={1}>
         <Tooltip label={model.name}>
