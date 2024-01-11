@@ -35,6 +35,7 @@ import { useDialog } from "../components/AlertDialogProvider";
 import { CivitiModel, CivitiModelFileVersion } from "../types";
 import { InstallModelsApiInput, installModelsApi } from "../api/modelsApi";
 import ModelCard from "./ModelCard";
+import InstallProgress from "./InstallProgress";
 const IMAGE_SIZE = 200;
 
 export default function GalleryModal({ onclose }: { onclose: () => void }) {
@@ -84,8 +85,9 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
             <Heading size={"md"} mr={2}>
               Models
             </Heading>
-            <Input placeholder="Search models in CivitAI" />
+            <Input placeholder="Search models in CivitAI" width={"60%"} />
           </HStack>
+          <InstallProgress />
           {isSelecting && (
             <HStack gap={3}>
               <Checkbox isChecked={isAllSelected}>All</Checkbox>

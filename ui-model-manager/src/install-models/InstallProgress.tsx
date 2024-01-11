@@ -1,6 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Text } from "@chakra-ui/react";
 
 export default function InstallProgress() {
-  return <Text></Text>;
+  const [progress, setProgress] = useState("");
+  const handleModelInstallMessage = (event: Event) => {
+    console.log("handleModelInstallMessage", event);
+    const text = (event as CustomEvent).detail;
+    const lines = text.split("\n");
+    const lastLine = lines.reverse().find((line: string) => line.trim() !== "");
+    setProgress(lastLine ?? "");
+  };
+
+  useEffect(() => {
+    // Attach the event listener
+    window.addEventListener("model_install_message", handleModelInstallMessage);
+
+    // Cleanup function to remove the event listener
+    return () => {
+      window.removeEventListener(
+        "model_install_message",
+        handleModelInstallMessage
+      );
+    };
+  }, []);
+
+  return <Text>{progress}</Text>;
 }

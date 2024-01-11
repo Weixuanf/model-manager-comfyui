@@ -18,14 +18,12 @@ export const installModelsApi = async (target: InstallModelsApiInput) => {
     const reader = response.body.getReader();
     while (true) {
       const { done, value } = await reader.read();
-      console.log("done:", done);
       if (done) break;
-
       const text = new TextDecoder().decode(value);
-      console.log("text:", text);
-      // Dispatch custom event with the data
       window.dispatchEvent(
-        new CustomEvent("model-installation-message", { detail: text })
+        new CustomEvent("model_install_message", {
+          detail: text,
+        })
       );
     }
   } catch (error) {
