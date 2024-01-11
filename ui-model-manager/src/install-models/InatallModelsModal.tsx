@@ -44,12 +44,19 @@ type MODEL_TYPE =
   | "Hypernetwork"
   | "AestheticGradient"
   | "LORA"
+  | "LoCon"
   | "Controlnet"
-  | "Poses";
+  | "Upscaler"
+  | "MotionModule"
+  | "VAE"
+  | "Poses"
+  | "Wildcards"
+  | "Workflows";
 type CivitModelQueryParams = {
-  types?: string;
+  types?: MODEL_TYPE;
   query?: string;
   limit?: string;
+  nsfw?: "false";
 };
 const ALL_MODEL_TYPES: MODEL_TYPE[] = [
   "Checkpoint",
@@ -57,30 +64,47 @@ const ALL_MODEL_TYPES: MODEL_TYPE[] = [
   "Hypernetwork",
   "AestheticGradient",
   "LORA",
+  "LoCon",
   "Controlnet",
+  "Upscaler",
+  "MotionModule",
+  "VAE",
   "Poses",
+  "Wildcards",
+  "Workflows",
 ];
-
+const MODEL_TYPE_TO_FOLDER_MAPPING: Record<MODEL_TYPE, string> = {
+  Checkpoint: "checkpoints",
+  TextualInversion: "embeddings",
+  Hypernetwork: "hypernetworks",
+  // AestheticGradient: "aesthetic_gradients", // not sure where this is
+  LORA: "loras",
+  Controlnet: "controlnet",
+  Poses: "poses",
+  Upscaler: "upscale_models",
+  VAE: "vae",
+};
 export default function GalleryModal({ onclose }: { onclose: () => void }) {
   const [selectedID, setSelectedID] = useState<string[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [models, setModels] = useState<CivitiModel[]>([]);
   const [loading, setLoading] = useState(false);
-  const [modelType, setModelType] = useState<MODEL_TYPE>("Checkpoint");
+  const [modelType, setModelType] = useState<MODEL_TYPE | undefined>(
+    "Checkpoint"
+  );
   const { showDialog } = useDialog();
   const [searchQuery, setSearchQuery] = useState("");
   const loadData = useCallback(async () => {
     setLoading(true);
     const params: CivitModelQueryParams = {
       limit: "30",
-      types: "Checkpoint",
+      nsfw: "false",
+      types: modelType,
     };
     if (searchQuery !== "") {
       params.query = searchQuery;
     }
-    if (modelType != null) {
-      params.types = modelType;
-    }
+
     const queryString = new URLSearchParams(params).toString();
     const fullURL = `https://civitai.com/api/v1/models?${queryString}`;
 
@@ -90,16 +114,29 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
     setModels(json.items);
     setLoading(false);
   }, [searchQuery, modelType]);
-  const onClickInstallModel = (file: CivitiModelFileVersion) => {
+  const onClickInstallModel = (
+    file: CivitiModelFileVersion,
+    model: CivitiModel
+  ) => {
     console.log("file", file);
     if (file.downloadUrl == null || file.name == null) {
       console.error("file.downloadUrl or file.name is null");
       return;
     }
+    let folderPath: string | null =
+      MODEL_TYPE_TO_FOLDER_MAPPING[model.type as MODEL_TYPE];
+    if (folderPath == null) {
+      folderPath = prompt(
+        "What's the folder path under /ComfyUI/models you want to save the model? "
+      );
+    }
+    if (folderPath == null) {
+      return;
+    }
     installModelsApi({
       filename: file.name,
       name: file.name,
-      save_path: "checkpoints",
+      save_path: folderPath,
       url: file.downloadUrl,
     });
   };
@@ -124,6 +161,16 @@ export default function GalleryModal({ onclose }: { onclose: () => void }) {
           </HStack>
           <InstallProgress />
           <HStack gap={2} mb={2} wrap={"wrap"}>
+            <Button
+              size={"sm"}
+              py={1}
+              onClick={() => {
+                setModelType(undefined);
+              }}
+              isActive={modelType == null}
+            >
+              All
+            </Button>
             {ALL_MODEL_TYPES.map((type) => {
               return (
                 <Button

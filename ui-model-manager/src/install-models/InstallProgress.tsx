@@ -24,7 +24,7 @@ export default function InstallProgress() {
   }, []);
 
   return (
-    <Text fontWeight={"400"} fontSize={15}>
+    <Text fontWeight={"500"} fontSize={18} py={2}>
       {progress}
     </Text>
   );

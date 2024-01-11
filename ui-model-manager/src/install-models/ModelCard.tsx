@@ -20,7 +20,10 @@ const IMAGE_SIZE = 280;
 
 interface ModelCardProps {
   model: CivitiModel;
-  onClickInstallModel: (model: CivitiModelFileVersion) => void;
+  onClickInstallModel: (
+    file: CivitiModelFileVersion,
+    model: CivitiModel
+  ) => void;
 }
 export default function ModelCard({
   model,
@@ -43,7 +46,7 @@ export default function ModelCard({
       console.error("no file is find by name", selectedFile);
       return;
     }
-    onClickInstallModel(curFile);
+    onClickInstallModel(curFile, model);
   }, [selectedFile]);
   return (
     <Card width={IMAGE_SIZE} justifyContent={"space-between"} mb={2} gap={1}>
@@ -72,6 +75,7 @@ export default function ModelCard({
             flexShrink={1}
             variant={"outline"}
             px={1}
+            cursor={"text"}
           >
             <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
               {model.type}
