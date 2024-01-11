@@ -38,7 +38,7 @@ export function Topbar({}: Props) {
       left += curLeft;
       const clientWidth = document.documentElement.clientWidth;
       const clientHeight = document.documentElement.clientHeight;
-      const panelElement = document.getElementById("workspaceManagerPanel");
+      const panelElement = document.getElementById("modelManagerPanel");
       const offsetWidth = panelElement?.offsetWidth || 392;
 
       if (top + 36 > clientHeight) top = clientHeight - 36;
@@ -65,12 +65,14 @@ export function Topbar({}: Props) {
           padding: 2,
           position: "fixed",
           ...positionStyle,
+          // top:0,
+          // left:0,
         }}
         justifyContent={"flex-end"}
         alignItems={"center"}
         gap={2}
         draggable={false}
-        id="workspaceManagerPanel"
+        id="modelManagerPanel"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

@@ -9,7 +9,7 @@ export type InstallModelsApiInput = {
 };
 export const installModelsApi = async (target: InstallModelsApiInput) => {
   try {
-    const response = await api.fetchApi("/model_manager/install_model", {
+    const response = await api.fetchApi("/model_manager/install_model_stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(target),
