@@ -101,7 +101,6 @@ export default function ModelCard({
           >
             {versionFiles?.map((versionFile) => {
               const filename = versionFile?.name;
-              console.log("versionFile", versionFile);
               if (!filename) return null;
               return (
                 <option

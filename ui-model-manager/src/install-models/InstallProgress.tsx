@@ -4,7 +4,6 @@ import { Text } from "@chakra-ui/react";
 export default function InstallProgress() {
   const [progress, setProgress] = useState("");
   const handleModelInstallMessage = (event: Event) => {
-    console.log("handleModelInstallMessage", event);
     const text = (event as CustomEvent).detail;
     const lines = text.split("\n");
     const lastLine = lines.reverse().find((line: string) => line.trim() !== "");
@@ -24,5 +23,9 @@ export default function InstallProgress() {
     };
   }, []);
 
-  return <Text>{progress}</Text>;
+  return (
+    <Text fontWeight={"400"} fontSize={15}>
+      {progress}
+    </Text>
+  );
 }
